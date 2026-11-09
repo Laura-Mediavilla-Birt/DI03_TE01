@@ -1,0 +1,50 @@
+@if (restaurantes().length === 0) {
+  <ion-item lines="none" color="light" class="sin-datos">
+    <ion-icon slot="start" name="bar-chart-outline" color="medium"></ion-icon>
+    <ion-label class="ion-text-wrap">
+      No hay datos que mostrar. Ajusta los filtros o pulsa <strong>Cargar</strong>.
+    </ion-label>
+  </ion-item>
+} @else {
+  <ion-grid class="graficos-grid">
+    <ion-row>
+
+      <!-- Gráfico 1: Restaurantes por territorio (barras verticales) -->
+      <ion-col size="12" size-lg="7">
+        <ion-card class="chart-card">
+          <ion-card-content>
+            <app-grafico-barra-vertical [restaurantes]="restaurantes()"></app-grafico-barra-vertical>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+      <!-- Gráfico 2: Distinciones gastronómicas por territorio (líneas) -->
+      <ion-col size="12" size-lg="5">
+        <ion-card class="chart-card">
+          <ion-card-content>
+            <app-grafico-linea [restaurantes]="restaurantes()"></app-grafico-linea>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+      <!-- Gráfico 3: Restaurantes por tipo de establecimiento (barras horizontales) -->
+      <ion-col size="12" size-lg="5">
+        <ion-card class="chart-card">
+          <ion-card-content>
+            <app-grafico-barra-horizontal [restaurantes]="restaurantes()"></app-grafico-barra-horizontal>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+      <!-- Gráfico 4: Top 10 localidades (donut) -->
+      <ion-col size="12" size-lg="7">
+        <ion-card class="chart-card">
+          <ion-card-content>
+            <app-grafico-donut [restaurantes]="restaurantes()"></app-grafico-donut>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+    </ion-row>
+  </ion-grid>
+}
