@@ -66,27 +66,36 @@ export class GraficoLineaComponent implements OnDestroy {
   private render(data: Restaurante[], canvas: HTMLCanvasElement) {
     // TODO: limpia la instancia anterior porque este método puede volver
     // a ejecutarse al cambiar los filtros o los datos de entrada.
+    this.chart?.destroy();
 
     // TODO: 'mapa' debe guardar una entrada por territorio y dos valores
     // acumulados. Una propiedad representa estrellas y la otra soles.
     // El tipo de la estructura sirve para recordar qué información conserva.
     // Tendremos un map de un string y un objeto que contenga los datos de michelin y repsol
-    const mapa = [];
+    const mapa = new Map<string, { michelin: number; repsol: number }>();
+
     data.forEach(r => {
       // TODO: extrae la categoría común de cada restaurante y obtén los
       // acumuladores existentes; si es la primera aparición, parte de cero.
       // territorio hace uso del campo territory
-      const territorio = null;
+      const territorio = r.territory?.trim() || 'Desconocido';
+
       // estrellas coge el valor actual o las ponemos a 0
-      const estrellas = null;
+      const estrellas = mapa.get(territorio) ?? {
+        michelin: 0,
+        repsol: 0
+      };
+
       // TODO: suma en cada acumulador la distinción correspondiente del
       // restaurante actual. Convierte los datos si el JSON no los entrega
       // directamente como números y evita que un valor vacío rompa la suma.
-      
+      estrellas.michelin += Number(r.michelinStar) || 0;
+      estrellas.repsol += Number(r.repsolSun) || 0;
+
       // TODO: después de modificar el objeto acumulador, vuelve a dejarlo
       // asociado a su territorio para conservar el resultado del recorrido.
       // seteamos los valores nuevos de territorio y estrellas al mapa
-
+      mapa.set(territorio, estrellas);
     });
 
     // TODO: descarta categorías sin datos útiles (filter) y elige un orden estable (sort).
@@ -95,15 +104,17 @@ export class GraficoLineaComponent implements OnDestroy {
     // En resumen, convierte un Map en un array, filtra sus elementos y los ordena alfabéticamente.
     // habrá que hacer uso de entries() de mapa, para convertir el map en array y obtener [clave, valor]
     // Para el filtro, ignoraremos la clave y guardaremos solo el valor si es mayor que 0 de michelin y repsol
-    // Para ordenar podemos hacer uso de localeCompare para comparar mejor tildes, ñ,...; a[0].localeCompare(b[0]) 
-    const entries = [];
+    // Para ordenar podemos hacer uso de localeCompare para comparar mejor tildes, ñ,...; a[0].localeCompare(b[0])
+    const entries = Array.from(mapa.entries())
+      .filter(([, valores]) => valores.michelin > 0 || valores.repsol > 0)
+      .sort((a, b) => a[0].localeCompare(b[0]));
 
     // TODO: prepara una lista de etiquetas y una lista de valores para
     // cada serie. Todas deben conservar exactamente el mismo orden para que
     // las dos líneas comparen los mismos territorios.
-    const labels: string[] = []; //cogeremos la clave del array
-    const michelin: number[] = []; //cogeremos el valor del array, pero que sea michelin
-    const repsol: number[] = []; //cogeremos el valor del array, pero que sea repsol
+    const labels: string[] = entries.map(([territorio]) => territorio);
+    const michelin: number[] = entries.map(([, valores]) => valores.michelin);
+    const repsol: number[] = entries.map(([, valores]) => valores.repsol);
 
     // TODO: configura una gráfica con dos series, una por cada magnitud.
     // Cada serie necesita una etiqueta identificativa y sus valores asociados.
@@ -118,12 +129,24 @@ export class GraficoLineaComponent implements OnDestroy {
             data: michelin,
             borderColor: '#eb445a',
             backgroundColor: '#eb445a22',
+            fill: true,
+            tension: 0.4,
+            pointRadius: 4,
+            pointHoverRadius: 7,
+            pointBackgroundColor: '#eb445a',
+            borderWidth: 2
           },
           {
             label: '☀️ Soles Repsol',
             data: repsol,
             borderColor: '#ffc409',
             backgroundColor: '#ffc40922',
+            fill: true,
+            tension: 0.4,
+            pointRadius: 4,
+            pointHoverRadius: 7,
+            pointBackgroundColor: '#ffc409',
+            borderWidth: 2
           }
         ]
       },
@@ -131,10 +154,17 @@ export class GraficoLineaComponent implements OnDestroy {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { display: true, position: 'top', labels: { color: '#333', usePointStyle: true } },
+          legend: {
+            display: true,
+            position: 'top',
+            labels: {
+              color: '#333',
+              usePointStyle: true
+            }
+          },
           title: {
             display: true,
-            text: '',
+            text: 'Distinciones gastronómicas por territorio',
             font: { size: 15, weight: 'bold' },
             color: '#333',
             padding: { bottom: 14 }
@@ -142,17 +172,30 @@ export class GraficoLineaComponent implements OnDestroy {
           tooltip: {
             callbacks: {
               //TODO: mostrar el texto
-              label: ctx => ` `
+              label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y}`
             }
           }
         },
         scales: {
           //TODO: Configurar los ticks, beginAtZero,grid...
           y: {
-
+            beginAtZero: true,
+            ticks: {
+              precision: 0,
+              stepSize: 1,
+              color: '#555'
+            },
+            grid: {
+              color: 'rgba(0,0,0,0.06)'
+            }
           },
           x: {
-
+            ticks: {
+              color: '#555'
+            },
+            grid: {
+              display: false
+            }
           }
         }
       }

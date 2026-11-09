@@ -1,16 +1,15 @@
-
 export const environment = {
   production: false,
   auth: {
-    email: 'mardanza@birt.eus',
+    email: 'lmediavilla@ikaslea.birt.eus',
     password: 'Test1234',
   },
-  firebase : {
-    apiKey: "AIzaSyBGXAMJMVhgfAUorRqBZLg9DXTjXF_3R5k",
-    authDomain: "di-bbdd-472ce.firebaseapp.com",
-    projectId: "di-bbdd-472ce",
-    storageBucket: "di-bbdd-472ce.firebasestorage.app",
-    messagingSenderId: "1053575576004",
-    appId: "1:1053575576004:web:033199ff777d04aaf40c91"
+  firebase: {
+    apiKey: 'AIzaSyCRP9yHqHaixaQ6PhW67hbtHGDBp3O5-qg',
+    authDomain: 'guia-restaurantes-euskadi.firebaseapp.com',
+    projectId: 'guia-restaurantes-euskadi',
+    storageBucket: 'guia-restaurantes-euskadi.firebasestorage.app',
+    messagingSenderId: '917572683774',
+    appId: '1:917572683774:web:ff0e5c3630e59859aae2af'
   }
 }

@@ -50,23 +50,28 @@ export class GraficoBarraVerticalComponent implements OnDestroy {
   private render(data: Restaurante[], canvas: HTMLCanvasElement) {
     // TODO: elimina la gráfica anterior antes de volver a pintar cuando
     // el efecto reciba datos nuevos.
+    this.chart?.destroy();
 
     // TODO: 'counts' debe guardar una entrada por territorio. Usa el
     // territorio como clave y reserva un número para acumular restaurantes mediante Map.
-    const counts = null;
+    const counts = new Map<string, number>();
+
     data.forEach(r => {
       // TODO: extrae de cada restaurante el territorio que quieres dibujar -> campo territory
       // como categoría. Decide cómo tratar los valores vacíos o inexistentes.
-      const territorio = null;
+      const territorio = r.territory?.trim() || 'Desconocido';
+
       // TODO: recupera el contador de ese territorio, suma el restaurante
       // actual y guarda de nuevo el resultado asociado a la misma clave.
-      
+      const cantidad = counts.get(territorio) ?? 0;
+      counts.set(territorio, cantidad + 1);
     });
 
     // TODO: convierte los grupos en una lista ordenable. Cada entrada
     // conserva el nombre del territorio y el número que debe medir la barra.
     // Elige un criterio de orden que facilite la comparación visual ((a, b) => b[1] - a[1]).
-    const sorted = null;
+    const sorted = Array.from(counts.entries())
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
 
     // TODO: crea la gráfica en el canvas y construye la configuración de
     // Chart.js haciendo corresponder cada etiqueta con su valor numérico.
@@ -74,14 +79,14 @@ export class GraficoBarraVerticalComponent implements OnDestroy {
       type: 'bar',
       data: {
         // TODO: las etiquetas forman las categorías del eje horizontal.
-        labels: [],
+        labels: sorted.map(([territorio]) => territorio),
         datasets: [{
           label: 'Restaurantes',
           // TODO: los valores deben estar en el mismo orden que las
           // etiquetas: el primer valor corresponde a la primera categoría.
-          data: [],
-          backgroundColor: [], //CHART_PALETTE[i % CHART_PALETTE.length] + 'bb')
-          borderColor: [], //CHART_PALETTE[i % CHART_PALETTE.length]
+          data: sorted.map(([, cantidad]) => cantidad),
+          backgroundColor: sorted.map((_, i) => CHART_PALETTE[i % CHART_PALETTE.length] + 'bb'),
+          borderColor: sorted.map((_, i) => CHART_PALETTE[i % CHART_PALETTE.length]),
           borderWidth: 2,
           // borderRadius: redondea las esquinas superiores de cada barra
           borderRadius: 8,
@@ -101,7 +106,7 @@ export class GraficoBarraVerticalComponent implements OnDestroy {
           legend: { display: false },
           title: {
             display: true,
-            text: '',
+            text: 'Restaurantes por territorio',
             font: { size: 15, weight: 'bold' },
             color: '#333',
             padding: { bottom: 14 }
@@ -116,10 +121,19 @@ export class GraficoBarraVerticalComponent implements OnDestroy {
         scales: {
           //TODO: controlar los ticks, beginAtZero, grid... en los x e y si es necesario.
           y: {
-
+            beginAtZero: true,
+            ticks: {
+              precision: 0,
+              stepSize: 1
+            },
+            grid: {
+              color: 'rgba(0, 0, 0, 0.08)'
+            }
           },
           x: {
-
+            grid: {
+              display: false
+            }
           }
         }
       }

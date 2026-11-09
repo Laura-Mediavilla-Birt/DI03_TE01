@@ -49,7 +49,7 @@
       <ion-icon slot="start" name="information-circle-outline" color="primary"></ion-icon>
       <ion-label class="ion-text-wrap">
         Usa <ion-icon name="restaurant-outline"></ion-icon> <strong>Cargar</strong> para ver los datos,
-        , <ion-icon name="cloud-upload-outline"></ion-icon> <strong>Actualizar</strong> para subir datos nuevos a Firebase.
+        <ion-icon name="cloud-upload-outline"></ion-icon> <strong>Actualizar</strong> para subir datos nuevos a Firebase
         o <ion-icon name="download-outline"></ion-icon> <strong>Exportar</strong> para guardar los datos en tu dispositivo.
       </ion-label>
     </ion-item>
@@ -67,7 +67,10 @@
 
   @if (hayDatos()) {
     <!-- TODO - Añadir el value y ionChange -->
-    <ion-segment class="vista-segment">
+    <ion-segment
+      class="vista-segment"
+      [value]="vistaActual()"
+      (ionChange)="cambiarVista($event.detail.value)">
       <ion-segment-button value="tabla">
         <ion-icon name="list-outline"></ion-icon>
         <ion-label>Tabla</ion-label>
@@ -175,6 +178,7 @@
           <ion-icon name="close-circle-outline"></ion-icon>
         </ion-chip>
       }
+
       @for (t of territoriosSeleccionados(); track t) {
         <ion-chip color="secondary"
           (click)="eliminarTerritorio(t)"
@@ -183,6 +187,7 @@
           <ion-icon name="close-circle-outline"></ion-icon>
         </ion-chip>
       }
+
       @for (loc of localidadesSeleccionadasArray; track loc) {
         <ion-chip color="tertiary"
           (click)="eliminarLocalidad(loc)"
@@ -210,9 +215,9 @@
   }
 
   <!-- H7: encabezados clicables para reordenar → el usuario experto localiza registros sin usar los filtros de texto -->
-  <!-- H8: solo las columnas de datos clave; iconos de estrella/sol en lugar de números para Michelin y Repsol --> 
+  <!-- H8: solo las columnas de datos clave; iconos de estrella/sol en lugar de números para Michelin y Repsol -->
   <!-- TODO - Controlar vistaActual para mostrar el segmento tabla-->
-
+  @if (vistaActual() === 'tabla') {
     @if (restaurantesFiltrados().length > 0) {
       <ion-grid class="tabla-grid">
 
@@ -305,7 +310,11 @@
         </ion-item>
       }
     }
+  }
 
   <!-- TODO - Controlar vistaActual para mostrar el segmento graficos y mostrar el componente correspondiente-->
+  @if (vistaActual() === 'graficos') {
+    <app-graficos [restaurantes]="restaurantesFiltrados()"></app-graficos>
+  }
 
 </ion-content>
